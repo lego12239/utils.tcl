@@ -22,3 +22,26 @@ proc _str_insert {str pos text} {
 	return [string replace $str $pos $pos "$text[string index $str $pos]"]
 }
 
+# Get a list item with a maximum value.
+proc lmax {l} {
+	set ret [lindex $l 0]
+	foreach i $l {
+		if {[string compare $i $ret] == 1} {
+			set ret $i
+		}
+	}
+
+	return $ret
+}
+
+# Get a list item with a minimum value.
+proc lmin {l} {
+	set ret [lindex $l 0]
+	foreach i $l {
+		if {[string compare $i $ret] == -1} {
+			set ret $i
+		}
+	}
+
+	return $ret
+}
