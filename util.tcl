@@ -9,6 +9,22 @@ proc _split {str} {
 	apply {args { return $args; }} {*}$str;
 }
 
+# Get a tcl object type.
+# ret:
+#  dict - for dict
+#  list - for list
+#  string - for string
+#  pure - for pure string
+#  int - for integer
+#  double - for double
+#proc _get_otype {obj} {
+#	return [lindex [split [tcl::unsupported::representation $obj]] 3]
+#}
+proc _get_otype {obj} {
+	set s [tcl::unsupported::representation $obj]
+	return [string range $s 11 [string first " " $s 11]-1]
+}
+
 # Insert specified text at pos pos in str.
 # If pos <= 0, then prepend text to str.
 # If pos >= LEN(str), then append text to str.
