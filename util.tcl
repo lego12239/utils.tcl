@@ -39,10 +39,19 @@ proc _str_insert {str pos text} {
 }
 
 # Get a list item with a maximum value.
-proc lmax {l} {
+# To do a number comparing instead of string comparing(by default) set cmd to:
+# {apply {{a b} {if {$a == $b} { return 0; }; return [expr {$a>$b ? 1 : -1}]; }}}
+# Or to some number_cmp, which can be defined as:
+# proc number_cmp {a b} {
+# 	if {$a == $b} {
+# 	  return 0
+# 	}
+# 	return [expr {$a>$b ? 1 : -1}]
+# }
+proc lmax {l {cmd "string compare"}} {
 	set ret [lindex $l 0]
 	foreach i $l {
-		if {[string compare $i $ret] == 1} {
+		if {[{*}$cmd $i $ret] == 1} {
 			set ret $i
 		}
 	}
@@ -51,10 +60,19 @@ proc lmax {l} {
 }
 
 # Get a list item with a minimum value.
-proc lmin {l} {
+# To do a number comparing instead of string comparing(by default) set cmd to:
+# {apply {{a b} {if {$a == $b} { return 0; }; return [expr {$a>$b ? 1 : -1}]; }}}
+# Or to some number_cmp, which can be defined as:
+# proc number_cmp {a b} {
+# 	if {$a == $b} {
+# 	  return 0
+# 	}
+# 	return [expr {$a>$b ? 1 : -1}]
+# }
+proc lmin {l {cmd "string compare"}} {
 	set ret [lindex $l 0]
 	foreach i $l {
-		if {[string compare $i $ret] == -1} {
+		if {[{*}$cmd $i $ret] == -1} {
 			set ret $i
 		}
 	}
