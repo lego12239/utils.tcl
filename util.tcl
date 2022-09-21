@@ -79,3 +79,45 @@ proc lmin {l {cmd "string compare"}} {
 
 	return $ret
 }
+
+# Parse options from argslist.
+# Stop on first non-option argument or after --.
+# prms:
+#  argslist - arguments to parse
+#  spec     - opts spec. A dict where:
+#             key - opt name (started with "-")
+#             value - 0 for opt without argument
+#                     1 for opt with argument
+# ret:
+#  list - 1 item is opts dict with opts from argslist, 2 item is index for first
+#         non-option argument
+#
+# E.g.:
+#  _opts_parse "-dval -t 7 -- fname q" {-dval 0 -D 1 -t 1}
+#
+proc _opts_parse {argslist spec} {
+	set opts [dict create]
+
+	for {set i 0} {$i < [llength $argslist]} {incr i} {
+		set lex [lindex $argslist $i]
+		if {![string equal -length 1 $lex "-"]} {
+			break
+		}
+		if {$lex eq "--"} {
+			incr i
+			break
+		}
+		if {![dict exists $spec $lex]} {
+			error "wrong option: $lex"
+		}
+		set val [dict get $spec $lex]
+		if {[lindex $val 0]} {
+			incr i
+			dict set opts $lex [lindex $argslist $i]
+		} else {
+			dict incr opts $lex
+		}
+	}
+
+	return [list $opts $i]
+}
