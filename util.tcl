@@ -121,3 +121,67 @@ proc _opts_parse {argslist spec} {
 
 	return [list $opts $i]
 }
+
+# Parse a network address in plan9 format.
+# prms:
+#  naddr  - a network address in plan9 format
+# ret:
+#  {net NET addr ADDR srv SRV} - parsed network address.
+#
+# Address syntax:
+#  NET!ADDR!SRV  or
+#  NET!ADDR!0    or
+#  NET!ADDR      or
+#  ADDR
+# Where NET is a network protocol(like 'tcp' or 'udp') or 'net' for any net,
+# ADDR is a host name or a host address(can be '*' for any address),
+# SRV is a protocol specific service.
+# Example: tcp!127.0.0.1!8888
+proc _naddr_parse {naddr} {
+	set addr [dict create net "" addr "" srv ""]
+	set naddr_ [split $naddr "!"]
+	switch [llength $naddr_] {
+	3 {
+		dict set addr net [string tolower [lindex $naddr_ 0]]
+		dict set addr addr [string tolower [lindex $naddr_ 1]]
+		dict set addr srv [string tolower [lindex $naddr_ 2]]
+	}
+	2 {
+		dict set addr net [string tolower [lindex $naddr_ 0]]
+		dict set addr addr [string tolower [lindex $naddr_ 1]]
+	}
+	1 {
+		dict set addr addr [string tolower [lindex $naddr_ 0]]
+	}
+	default {
+		error "Wrong network address syntax: '$naddr'"
+	}
+	}
+
+
+	return $addr
+}
+
+# Example naddr_parse for using a parsed addr with socket command.
+# prms:
+#  naddr   - a network address in plan9 format
+#  defaddr - a default addr if '*' is specified (0.0.0.0 by default)
+# ret:
+#  {net NET addr ADDR srv SRV} - parsed network address.
+proc naddr_parse {naddr {defaddr 0.0.0.0}} {
+	set addr [_naddr_parse $naddr]
+	if {[dict get $addr net] ne "tcp"} {
+		error "Unsupported net in network address: [dict get $addr net]"
+	}
+	if {[dict get $addr net] eq "net"} {
+		dict set addr net tcp
+	}
+	if {[dict get $addr addr] eq "*"} {
+		dict set addr addr $defaddr
+	}
+	if {[dict get $addr srv] eq ""} {
+		dict set addr srv 0
+	}
+
+	return $addr
+}
