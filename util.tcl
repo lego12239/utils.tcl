@@ -301,7 +301,7 @@ proc html_unescape {str} {
 		if {[string equal -length 3 $esc "&#x"]} {
 			append res [format %c [scan [string range $esc 3 end-1] %x]]
 		} elseif {[string equal -length 2 $esc "&#"]} {
-			append res [format %c [string range $esc 2 end-1]]
+			append res [format %c [scan [string range $esc 2 end-1] %u]]
 		} else {
 			append res [dict get $_html_unescape_escseq\
 			  [string range $esc 1 end-1]]
