@@ -314,3 +314,45 @@ proc html_unescape {str} {
 
 	return $res
 }
+
+# Create an anyPointer from a specified args.
+# anyPointer is inspired by JSON Pointer(rfc6901).
+# But it escapes also \n and \r chars to allow anyPointer
+# to remain on a single line.
+# prms:
+#  parts  - a list with elements
+# ret:
+#  STRING - formatted pointer
+proc anyptr_fmt {parts} {
+	set res ""
+
+	foreach s $parts {
+		regsub {%} $s "%0" s
+		regsub {/} $s "%1" s
+		regsub {\n} $s "%2" s
+		regsub {\r} $s "%3" s
+		append res "$s/"
+	}
+
+	return [string range $res 0 end-1]
+}
+
+# Parse an anyPointer into a list.
+# prms:
+#  str  - formatted pointer
+# ret:
+#  LIST - a list with elements
+proc anyptr_parse {str} {
+	set res [list]
+
+	foreach s [split $str "/"] {
+		regsub {%3} $s "\r" s
+		regsub {%2} $s "\n" s
+		regsub {%1} $s "/" s
+		regsub {%0} $s "%" s
+		lappend res $s
+	}
+
+	return $res
+}
+
