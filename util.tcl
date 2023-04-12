@@ -356,3 +356,34 @@ proc anyptr_parse {str} {
 	return $res
 }
 
+# Escape specified arguments to allow using with "exec {sh -c "$cmd"}".
+# prms:
+#  cmdargs - list with arguments
+#  shell   - a shell with which a returned string will be used
+#            (supported: sh, bash)
+# ret:
+#  STRING  - a string with escaped arguments separated by spaces
+#
+proc cmdargs_escape {cmdargs {shell sh}} {
+	set res ""
+	set space ""
+
+	foreach arg $cmdargs {
+		switch -exact $shell {
+		sh -
+		bash {
+			set parts [split $arg ']
+			append res "${space}'[lindex $parts 0]'"
+			for {set i 1} {$i < [llength $parts]} {incr i} {
+				append res "\\''[lindex $parts $i]'"
+			}
+		}
+		default {
+			error "Unknown shell: $shell"
+		}
+		}
+		set space " "
+	}
+
+	return $res
+}
