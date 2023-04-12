@@ -387,3 +387,19 @@ proc cmdargs_escape {cmdargs {shell sh}} {
 
 	return $res
 }
+
+# Test if we run from a terminal.
+# ret:
+#  0/1  - 1 if yes
+proc is_run_from_term {} {
+	set fconf [fconfigure stdin]
+	if {![dict exists $fconf -mode]} {
+		return 0
+	}
+	set fconf [fconfigure stdout]
+	if {![dict exists $fconf -mode]} {
+		return 0
+	}
+	return 1
+}
+
