@@ -327,10 +327,10 @@ proc anyptr_fmt {parts} {
 	set res ""
 
 	foreach s $parts {
-		regsub {%} $s "%0" s
-		regsub {/} $s "%1" s
-		regsub {\n} $s "%2" s
-		regsub {\r} $s "%3" s
+		regsub -all {%} $s "%0" s
+		regsub -all {/} $s "%1" s
+		regsub -all {\n} $s "%2" s
+		regsub -all {\r} $s "%3" s
 		append res "$s/"
 	}
 
@@ -346,10 +346,10 @@ proc anyptr_parse {str} {
 	set res [list]
 
 	foreach s [split $str "/"] {
-		regsub {%3} $s "\r" s
-		regsub {%2} $s "\n" s
-		regsub {%1} $s "/" s
-		regsub {%0} $s "%" s
+		regsub -all {%3} $s "\r" s
+		regsub -all {%2} $s "\n" s
+		regsub -all {%1} $s "/" s
+		regsub -all {%0} $s "%" s
 		lappend res $s
 	}
 
