@@ -349,6 +349,9 @@ proc anyptr_parse {str} {
 		regsub -all {%3} $s "\r" s
 		regsub -all {%2} $s "\n" s
 		regsub -all {%1} $s "/" s
+		if {[regexp {%[^0]} $s m]} {
+			error "Unknown escape sequence '$m' in: $str"
+		}
 		regsub -all {%0} $s "%" s
 		lappend res $s
 	}
