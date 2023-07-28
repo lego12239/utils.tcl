@@ -406,3 +406,50 @@ proc is_run_from_term {} {
 	return 1
 }
 
+# Encode string according to percent encoding.
+# prms:
+#  str - a string to encode (must be a sequence of bytes, not unicode!)
+#
+# To encode some unicode string, convert it at fisrt:
+#   pctenc_encode [encoding convertto utf-8 $str]
+proc pctenc_encode {str} {
+	set res ""
+	set len [string length $str]
+	for {set i 0} {$i < $len} {incr i} {
+		set c [string index $str $i]
+		if {![regexp {[A-Za-z0-9_.~-]} $c]} {
+			set c "%[binary encode hex $c]"
+		}
+		append res $c
+	}
+	return $res
+}
+
+# Escape specified str (in Unicode).
+proc uri_part_escape {str} {
+	return [pctenc_encode [encoding convertto utf-8 $str]]
+}
+
+# Decode string from percent encoding.
+# prms:
+#  str - a string to decode
+proc pctenc_decode {str} {
+	set i0 0
+	set res ""
+	while {[set i1 [string first % $str $i0]] != -1} {
+		if {$i1 > $i0} {
+			set res "${res}[string range $str $i0 $i1-1]"
+		}
+		set res "${res}[binary decode hex [string range $str $i1+1 $i1+2]]"
+		set i0 [expr $i1 + 3]
+	}
+	if {$i0 < [string length $str]} {
+		set res "${res}[string range $str $i0 end]"
+	}
+	return $res
+}
+
+# Unescape specified str.
+proc uri_part_unescape {str} {
+	encoding convertfrom utf-8 [pctenc_decode [lindex $kv 0]]
+}
