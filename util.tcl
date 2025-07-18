@@ -528,3 +528,31 @@ proc netprefix_parse {prefix} {
 	return $parts
 }
 
+# Split string to argc count of parts by spaces.
+# prms:
+#  str - a string to split
+#  argc - argument counts
+# ret:
+#  LIST - a list with argc count of items
+#
+# If there are more words than argc, then all remain words are made a last
+# item.
+proc cmd_parse {str argc} {
+	set idx 0
+	set cmd [list]
+
+	for {incr argc -1} {$argc > 0} {incr argc -1} {
+		if {![regexp -start $idx -indices {(\S+)} $str res]} {
+			break
+		}
+		lappend cmd [string range $str {*}$res]
+		set idx [lindex $res 1]
+		incr idx
+	}
+	if {$idx < [string length $str]} {
+		lappend cmd [string trim [string range $str $idx end]]
+	}
+
+	return $cmd
+}
+
