@@ -476,3 +476,28 @@ proc pctenc_decode {str} {
 proc uri_part_unescape {str} {
 	encoding convertfrom utf-8 [pctenc_decode [lindex $kv 0]]
 }
+
+# Parse a text representation of a number (hex, bin, dec).
+# prms:
+#  str - a string (0xHEX, 0bBIN, DEC)
+# ret:
+#  "" - on error
+#  NUMBER - on success
+#
+# Proc protects against decimal been interpreted as octal.
+#
+proc parse_int {str} {
+	set num $str
+	# Protect against decimal been interpreted as octal.
+	# Remove leading zeroes.
+	if {[string is digit -strict $num]} {
+		set num [string trimleft $num 0]
+	}
+	set num [expr {$num}]
+	if {![string is digit -strict $num]} {
+		return ""
+	}
+
+	return $num
+}
+
