@@ -501,3 +501,30 @@ proc parse_int {str} {
 	return $num
 }
 
+# Parse a network prefix (E.g. 192.168.0.0/24)
+# prms:
+#  prefix - a network prefix to parse
+# ret:
+#  {IP PREFLEN} - list with ip and network prefix length
+#
+# If prefix has a wrong format, then error is thrown.
+proc netprefix_parse {prefix} {
+	if {![regexp {^([0-9]+\.){3}[0-9]+/[0-9]+$} $prefix]} {
+		error "wrong ip prefix format: $prefix"
+	}
+	set parts [split $prefix "/"]
+	set preflen [lindex $parts 1]
+	if {$preflen > 32} {
+		error "prefix length is wrong. Must be >= 0 and <= 32."
+	}
+	set nums [split [lindex $parts 0] "."]
+
+	for {set i 0} {$i < [llength $nums]} {incr i} {
+		if {[lindex $nums $i] > 255} {
+			error "ip number can't be greater than 255: $prefix"
+		}
+	}
+
+	return $parts
+}
+
