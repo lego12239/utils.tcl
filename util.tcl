@@ -82,11 +82,11 @@ proc lmin {l {cmd "string compare"}} {
 
 # Parse proc options.
 # prms:
-#  _argslist  - a name of list variable with arguments to parse
 #  spec       - opts spec. A dict where:
 #               key - opt name (started with "-")
 #               value - 0 for opt without argument
 #                       1 for opt with argument
+#  _argslist  - a name of list variable with arguments to parse
 #  prms       - parameters; you don't need to specify all parameters,
 #               just those that differ from the default value.
 #               possible parameters:
